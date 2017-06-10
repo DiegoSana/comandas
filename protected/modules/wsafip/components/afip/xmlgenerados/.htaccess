@@ -1,0 +1,4 @@
+<Directory /var/www/afip/afip/xmlgenerados>
+Order allow,deny
+Deny from all
+</Directory>
