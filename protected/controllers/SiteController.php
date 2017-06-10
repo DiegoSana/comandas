@@ -65,60 +65,60 @@ class SiteController extends Controller
 	 */
 	public function actionIndex()
 	{
-            foreach (Yii::app()->user->usuario->roles as $rol) {
-                if($rol->id==Roles::CAMARERO ||$rol->id==Roles::COMENSAL1 || $rol->id==Roles::COMENSAL) {
-                    $this->redirect ('/menu');
-                    break;
-                }
-            }            
-            $this->render('index');
+        foreach (Yii::app()->user->usuario->roles as $rol) {
+            if($rol->id==Roles::CAMARERO ||$rol->id==Roles::COMENSAL1 || $rol->id==Roles::COMENSAL) {
+                $this->redirect ('/menu');
+                break;
+            }
+        }
+        $this->render('index');
 	}
 
-        public function actionHome() {
-                $this->layout='//layouts/mainhb';
-                Yii::app()->setTheme('ascend');
-		$model=new LoginForm;
-                $contact=new ContactForm;
-		if(isset($_POST['ContactForm']))
-		{
-			$contact->attributes=$_POST['ContactForm'];
-			if($contact->validate())
-			{
-				$name='=?UTF-8?B?'.base64_encode($contact->name).'?=';
-				$subject='=?UTF-8?B?'.base64_encode($contact->subject).'?=';
-				$headers="From: $name <{$contact->email}>\r\n".
-					"Reply-To: {$contact->email}\r\n".
-					"MIME-Version: 1.0\r\n".
-					"Content-Type: text/plain; charset=UTF-8";
+    public function actionHome() {
+        $this->layout='//layouts/mainhb';
+        Yii::app()->setTheme('ascend');
+        $model=new LoginForm;
+        $contact=new ContactForm;
+        if(isset($_POST['ContactForm']))
+        {
+            $contact->attributes=$_POST['ContactForm'];
+            if($contact->validate())
+            {
+                $name='=?UTF-8?B?'.base64_encode($contact->name).'?=';
+                $subject='=?UTF-8?B?'.base64_encode($contact->subject).'?=';
+                $headers="From: $name <{$contact->email}>\r\n".
+                    "Reply-To: {$contact->email}\r\n".
+                    "MIME-Version: 1.0\r\n".
+                    "Content-Type: text/plain; charset=UTF-8";
 
-				mail(Yii::app()->params['adminEmail'],$subject,$contact->body,$headers);
-				Yii::app()->user->setFlash('contact','Gracias por contactarse con nosotros. Nos pondremos en contacto a la brevedad.');
-				$this->refresh();
-			}
-		}
-                $this->render('index',array('model'=>$model,'contact'=>$contact));
+                mail(Yii::app()->params['adminEmail'],$subject,$contact->body,$headers);
+                Yii::app()->user->setFlash('contact','Gracias por contactarse con nosotros. Nos pondremos en contacto a la brevedad.');
+                $this->refresh();
+            }
         }
-        
-        public function actionSettings() {
-            
-            $aplicaciones = Yii::app()->user->aplicaciones;
-            $newAppId = intval($_POST['Aplicacion']['id']);
-            
-            if(isset($newAppId)) {
-                foreach ($aplicaciones as $app) {
-                    if($app->id == intval($newAppId)) {
-                        Yii::app()->user->setState('aplicacion', $app);
-                        break;
-                    }
+        $this->render('index',array('model'=>$model,'contact'=>$contact));
+    }
+
+    public function actionSettings() {
+
+        $aplicaciones = Yii::app()->user->aplicaciones;
+        $newAppId = intval($_POST['Aplicacion']['id']);
+
+        if(isset($newAppId)) {
+            foreach ($aplicaciones as $app) {
+                if($app->id == intval($newAppId)) {
+                    Yii::app()->user->setState('aplicacion', $app);
+                    break;
                 }
             }
-            
-            $this->render('settings',array(
-                'aplicaciones'=>  $aplicaciones,
-                'aplicacion'=>  Yii::app()->user->aplicacion,
-                )
-            );
         }
+
+        $this->render('settings',array(
+            'aplicaciones'=>  $aplicaciones,
+            'aplicacion'=>  Yii::app()->user->aplicacion,
+            )
+        );
+    }
 
         /**
 	 * This is the action to handle external exceptions.
@@ -170,7 +170,7 @@ class SiteController extends Controller
 	public function actionLogin()
 	{
 		$model=new LoginForm;
-                
+        $this->render('login', ['model', $model]);
 		if(isset($_POST['LoginForm']))
 		{
 			$model->attributes=$_POST['LoginForm'];			
