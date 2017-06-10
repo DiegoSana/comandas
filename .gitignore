@@ -1,4 +1,4 @@
 /protected/config/database.php
 index.php
-/assets
 /tmp
+/.idea
