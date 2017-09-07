@@ -1,4 +1,5 @@
 /protected/config/database.php
+/protected/config/main.php
 /index.php
 /tmp
 /.idea

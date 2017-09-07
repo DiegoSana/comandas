@@ -38,31 +38,31 @@ class Controller extends CController
             }
             if(Yii::app()->user->id)
             {                    
-		if(isset(Yii::app()->user->es_comensal) && Yii::app()->user->es_comensal)
-		{                    
-			if(Pedidos::model()->findByAttributes(array('hash'=>Yii::app()->user->id), 'pedidos_estados_id != '.Pedidos::ACTIVO))
-				Yii::app()->session->destroy();
-                        if(!Yii::app()->authManager->getAuthItem('comensal'))
-                            Yii::app()->authManager->createAuthItem('comensal',2);
-                        if(!Yii::app()->authManager->isAssigned('comensal',Yii::app()->user->id))
-                            Yii::app()->authManager->assign('comensal',Yii::app()->user->id);
-		}
-		else
-		{
-                        Yii::app()->authManager->clearAll();
-             	   	$user = Yii::app()->user->usuario;
-              		foreach ($user->roles as $rolUsu)
-               		{
-	                    Yii::app()->authManager->createAuthItem($rolUsu->rol,2);
-	                    foreach (Roles::model()->findAllByAttributes(array(), 'orden > '.$rolUsu->orden) as $child)
-	                    {
-	                        if(!Yii::app()->authManager->getAuthItem($child->rol))
-	                            Yii::app()->authManager->createAuthItem($child->rol,2);
-	                        Yii::app()->authManager->addItemChild($rolUsu->rol, $child->rol);
-        	            }
-                	    Yii::app()->authManager->assign($rolUsu->rol,Yii::app()->user->id);
-	                }
-		}
+                if(isset(Yii::app()->user->es_comensal) && Yii::app()->user->es_comensal)
+                {
+                    if(Pedidos::model()->findByAttributes(array('hash'=>Yii::app()->user->id), 'pedidos_estados_id != '.Pedidos::ACTIVO))
+                        Yii::app()->session->destroy();
+                    if(!Yii::app()->authManager->getAuthItem('comensal'))
+                        Yii::app()->authManager->createAuthItem('comensal',2);
+                    if(!Yii::app()->authManager->isAssigned('comensal',Yii::app()->user->id))
+                        Yii::app()->authManager->assign('comensal',Yii::app()->user->id);
+                }
+                else
+                {
+                    Yii::app()->authManager->clearAll();
+                    $user = Yii::app()->user->usuario;
+                    foreach ($user->roles as $rolUsu)
+                    {
+                        Yii::app()->authManager->createAuthItem($rolUsu->rol,2);
+                        foreach (Roles::model()->findAllByAttributes(array(), 'orden > '.$rolUsu->orden) as $child)
+                        {
+                            if(!Yii::app()->authManager->getAuthItem($child->rol))
+                                Yii::app()->authManager->createAuthItem($child->rol,2);
+                            Yii::app()->authManager->addItemChild($rolUsu->rol, $child->rol);
+                        }
+                        Yii::app()->authManager->assign($rolUsu->rol,Yii::app()->user->id);
+                    }
+                }
                 if(!isset(Yii::app()->user->aplicacion) && Yii::app()->user->checkAccess('superadmin',array(Yii::app()->user->id))) {
                     $apps = Aplicacion::model()->findAll();
                     Yii::app()->user->setState('aplicaciones',$apps);

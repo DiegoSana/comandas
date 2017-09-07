@@ -6,7 +6,7 @@ class MenuController extends Controller
         public $categorias;
 
 
-        public function init()
+    public function init()
 	{
                 parent::init();
                 

@@ -31,7 +31,7 @@ class SiteController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('login','error','logout','home','contact'),
+				'actions'=>array('login','error','logout','home','contact','captcha'),
 				'users'=>array('*'),
 			),
 			array('deny',  // deny all users
@@ -71,6 +71,7 @@ class SiteController extends Controller
                 break;
             }
         }
+        $this->layout='//layouts/main';
         $this->render('index');
 	}
 
@@ -160,7 +161,7 @@ class SiteController extends Controller
 				$this->refresh();
 			}
 		}
-                $this->redirect('/site/home#contact');die;
+        $this->redirect('/site/home#contact');die;
 		$this->render('index',array('model'=>$model,'contact'=>$contact));
 	}
 
@@ -169,18 +170,18 @@ class SiteController extends Controller
 	 */
 	public function actionLogin()
 	{
-		$model=new LoginForm;
-        $this->render('login', ['model', $model]);
-		if(isset($_POST['LoginForm']))
+		$model=new LoginForm();
+        $this->layout = false;
+		if(isset($_POST['LoginForm']) && $_POST['LoginForm'])
 		{
-			$model->attributes=$_POST['LoginForm'];			
+			$model->attributes=$_POST['LoginForm'];
 			// validate user input and redirect to the previous page if valid			
-			if($model->validate() && $model->login())
-                            echo json_encode (array('success'=>true));
-                        else
-                            echo json_encode (array('success'=>false, 'err'=>$model->getErrors ()));
-                        die;
+			if($model->validate() && $model->login()) {
+			    $this->redirect('/site/index');
+            }
 		}
+
+        $this->render('/site/login', ['model' => $model]);
 	}
 
 	/**
