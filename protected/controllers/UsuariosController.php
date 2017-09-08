@@ -42,36 +42,36 @@ class UsuariosController extends Controller
 		);
 	}
         
-        protected function puedeEditar($idu)
+    protected function puedeEditar($idu)
+    {
+        $usuarioAevaluar = Usuarios::model()->findByAttributes(array('id'=>intval($idu),'estado'=>1));
+        $usuarioLogueado = Yii::app()->user->usuario;
+        if(Yii::app()->user->checkAccess('superadmin'))
+            return TRUE;
+        elseif($usuarioAevaluar->empresa_id==$usuarioLogueado->empresa_id)
         {
-            $usuarioAevaluar = Usuarios::model()->findByAttributes(array('id'=>intval($idu),'estado'=>1));
-            $usuarioLogueado = Yii::app()->user->usuario;
-            if(Yii::app()->user->checkAccess('superadmin'))
-                return TRUE;
-            elseif($usuarioAevaluar->empresa_id==$usuarioLogueado->empresa_id)
+            if($usuarioAevaluar->aplicaciones)
             {
-                if($usuarioAevaluar->aplicaciones)
+                $flagAp = FALSE;
+                foreach ($usuarioLogueado->aplicaciones as $app)
                 {
-                    $flagAp = FALSE;
-                    foreach ($usuarioLogueado->aplicaciones as $app)
-                    {
-                        foreach ($usuarioAevaluar->aplicaciones as $ap)
-                            if($ap->id==$app->id)
-                                $flagAp = TRUE;
-                    }
+                    foreach ($usuarioAevaluar->aplicaciones as $ap)
+                        if($ap->id==$app->id)
+                            $flagAp = TRUE;
                 }
-                else
-                    $flagAp = TRUE;
-                if($usuarioAevaluar->roles)
-                {
-                    $flagRol = ($usuarioAevaluar->roles[0]->orden>=$usuarioLogueado->roles[0]->orden);
-                }
-                else
-                    $flagRol = TRUE;
-                return ($flagAp && $flagRol);
             }
-            return FALSE;
+            else
+                $flagAp = TRUE;
+            if($usuarioAevaluar->roles)
+            {
+                $flagRol = ($usuarioAevaluar->roles[0]->orden>=$usuarioLogueado->roles[0]->orden);
+            }
+            else
+                $flagRol = TRUE;
+            return ($flagAp && $flagRol);
         }
+        return FALSE;
+    }
 
         /**
 	 * Displays a particular model.
@@ -79,12 +79,10 @@ class UsuariosController extends Controller
 	 */
 	public function actionView($id)
 	{
-            if($this->puedeEditar($id))
-		$this->render('view',array(
-			'model'=>$this->loadModel($id),
-		));
-            else
-                throw new CHttpException(403,'No tiene permisos.');
+        if($this->puedeEditar($id))
+		    $this->render('view',array('model'=>$this->loadModel($id),));
+        else
+            throw new CHttpException(403,'No tiene permisos.');
 	}
 
 	/**
@@ -94,92 +92,92 @@ class UsuariosController extends Controller
 	public function actionCreate()
 	{
 		$model=new Usuarios;
-                $usuariosRoles=new UsuariosRoles;
-                $usuariosAplicacion = new UsuariosAplicacion;
+        $usuariosRoles=new UsuariosRoles;
+        $usuariosAplicacion = new UsuariosAplicacion;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Usuarios']) && $_POST['UsuariosRoles'] && $_POST['UsuariosAplicacion']['aplicacion_id'])
 		{
-                    $transaction = Yii::app()->db->beginTransaction();
+            $transaction = Yii::app()->db->beginTransaction();
 			$model->attributes=$_POST['Usuarios'];                         
 			if($model->save()) {
-                            $usuariosRoles->usuarios_id = $model->id;
-                            $usuariosRoles->roles_id = intval($_POST['UsuariosRoles']['roles_id']);
-                            if($usuariosRoles->roles_id>0)
-                                $save = $usuariosRoles->save();
-                            if(!isset($save) || $save) {
-                                $usuariosAplicacion->usuarios_id = $model->id;
-                                $usuariosAplicacion->aplicacion_id = intval($_POST['UsuariosAplicacion']['aplicacion_id']);
-                                if($usuariosAplicacion->aplicacion_id>0)
-                                    $save1 = $usuariosAplicacion->save();
-                                if(!isset($save1) || $save1) {
-                                    $transaction->commit();
-                                    Yii::app()->user->setFlash('success', "El usuario \"".$model->usuario."\" se ha creado correctamente!");
-                                    $this->redirect(array('view','id'=>$model->id));
-                                }else
-                                    $transaction->rollback();
-                            }else
-                                $transaction->rollback();
-                        }else
-                            $transaction->rollback();
+                $usuariosRoles->usuarios_id = $model->id;
+                $usuariosRoles->roles_id = intval($_POST['UsuariosRoles']['roles_id']);
+                if($usuariosRoles->roles_id>0)
+                    $save = $usuariosRoles->save();
+                if(!isset($save) || $save) {
+                    $usuariosAplicacion->usuarios_id = $model->id;
+                    $usuariosAplicacion->aplicacion_id = intval($_POST['UsuariosAplicacion']['aplicacion_id']);
+                    if($usuariosAplicacion->aplicacion_id>0)
+                        $save1 = $usuariosAplicacion->save();
+                    if(!isset($save1) || $save1) {
+                        $transaction->commit();
+                        Yii::app()->user->setFlash('success', "El usuario \"".$model->usuario."\" se ha creado correctamente!");
+                        $this->redirect(array('view','id'=>$model->id));
+                    }else
+                        $transaction->rollback();
+                }else
+                    $transaction->rollback();
+            }else
+                $transaction->rollback();
 		}
 
 		$this->render('create',array(
 			'model'=>$model,
-                        'usuariosRoles'=>$usuariosRoles,
-                        'usuariosAplicacion'=>$usuariosAplicacion,
+            'usuariosRoles'=>$usuariosRoles,
+            'usuariosAplicacion'=>$usuariosAplicacion,
 		));
 	}
         
-        public function actionCreateComensal()
+    public function actionCreateComensal()
 	{
 		$usuario=new Usuarios;
-                $usuariosRoles=new UsuariosRoles;
-                $usuariosAplicacion = new UsuariosAplicacion;
+        $usuariosRoles=new UsuariosRoles;
+        $usuariosAplicacion = new UsuariosAplicacion;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($usuario);
 
 		if(isset($_POST['nombre']))
 		{
-                    $transaction = Yii::app()->db->beginTransaction();
-                    $usuario->nombre = $_POST['nombre'];
-                    $usuario->apellido = $_POST['nombre'];
-                    $usuario->usuario = time().'.'.$usuario->nombre;
-                    $usuario->pass = $usuario->usuario;
-                    $usuario->repass = $usuario->usuario;
-                    $usuario->empresa_id = Yii::app()->user->aplicacion->empresa_id;
-                    if($usuario->save()) {
-                        $usuariosRoles->usuarios_id = $usuario->id;
-                        $usuariosRoles->roles_id = Roles::COMENSAL1;
-                        if($usuariosRoles->roles_id > 0)
-                            $save = $usuariosRoles->save();
-                        if(!isset($save) || $save) {
-                            $usuariosAplicacion->usuarios_id = $usuario->id;
-                            $usuariosAplicacion->aplicacion_id = Yii::app()->user->aplicacion->id;
-                            if($usuariosAplicacion->aplicacion_id > 0)
-                                $save1 = $usuariosAplicacion->save();
-                            if(!isset($save1) || $save1) {
-                                $transaction->commit();
-                                $login=new LoginForm;
-                                $login->password = $usuario->usuario;
-                                $login->username = $usuario->usuario;
-                                $login->login();
-                                echo json_encode(array('success'=>true, 'msg'=>"Usuario creado!"));
-                                exit;
-                            }else
-                                $transaction->rollback();
-                        }else
-                            $transaction->rollback();
+            $transaction = Yii::app()->db->beginTransaction();
+            $usuario->nombre = $_POST['nombre'];
+            $usuario->apellido = $_POST['nombre'];
+            $usuario->usuario = time().'.'.$usuario->nombre;
+            $usuario->pass = $usuario->usuario;
+            $usuario->repass = $usuario->usuario;
+            $usuario->empresa_id = Yii::app()->user->aplicacion->empresa_id;
+            if($usuario->save()) {
+                $usuariosRoles->usuarios_id = $usuario->id;
+                $usuariosRoles->roles_id = Roles::COMENSAL1;
+                if($usuariosRoles->roles_id > 0)
+                    $save = $usuariosRoles->save();
+                if(!isset($save) || $save) {
+                    $usuariosAplicacion->usuarios_id = $usuario->id;
+                    $usuariosAplicacion->aplicacion_id = Yii::app()->user->aplicacion->id;
+                    if($usuariosAplicacion->aplicacion_id > 0)
+                        $save1 = $usuariosAplicacion->save();
+                    if(!isset($save1) || $save1) {
+                        $transaction->commit();
+                        $login=new LoginForm;
+                        $login->password = $usuario->usuario;
+                        $login->username = $usuario->usuario;
+                        $login->login();
+                        echo json_encode(array('success'=>true, 'msg'=>"Listo! Ya podes comenzar a pedir"));
+                        exit;
                     }else
                         $transaction->rollback();
+                }else
+                    $transaction->rollback();
+            }else
+                $transaction->rollback();
 
-                    echo json_encode(array('success'=>false, 'msg'=>"No se pudo crear el usuario", 'err'=>array('Debe ingresar el nombre',$usuario->getErrors(),$usuariosRoles->getErrors(),$usuariosAplicacion->getErrors())));
+            echo json_encode(array('success'=>false, 'msg'=>"No se pudo crear el usuario", 'err'=>array('Debe ingresar el nombre',$usuario->getErrors(),$usuariosRoles->getErrors(),$usuariosAplicacion->getErrors())));
 		} else {
-                    echo json_encode(array('success'=>false, 'msg'=>"No se pudo crear el usuario", 'err'=>array('Debe ingresar el nombre')));
-                }
+            echo json_encode(array('success'=>false, 'msg'=>"No se pudo crear el usuario", 'err'=>array('Debe ingresar el nombre')));
+        }
 	}
 
 	/**

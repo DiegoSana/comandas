@@ -42,7 +42,7 @@
           <li> <a href="#services" class="smoothScroll">Servicios</a></li>
           <li> <a href="#team" class="smoothScroll">Equipo</a></li>
           <li> <a href="#contact" class="smoothScroll">Contacto</a></li>
-          <li> <a data-toggle="modal" href="#loginModal">Login</a></li>          
+          <li> <a href="login">Login</a></li>
         </ul>
       </div>
       <!--/.nav-collapse --> 
