@@ -1,5 +1,6 @@
 /protected/config/database.php
 /protected/config/main.php
+/protected/config/main-paraiso.php
 /index.php
 /tmp
 /.idea
