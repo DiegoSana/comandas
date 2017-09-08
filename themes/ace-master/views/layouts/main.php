@@ -221,11 +221,22 @@
                                         <?php if(Yii::app()->user->checkAccess('encargado',array(Yii::app()->user->id))) {?>
                                             <li class="<?php echo ($uri[1]=='ordenes') ? 'active' : ''?>">
                                                     <a href="<?php echo Yii::app()->createUrl('ordenes');?>">
-                                                            <i class="menu-icon glyphicon glyphicon-bookmark"></i>
+                                                            <i class="menu-icon glyphicon glyphicon-pencil"></i>
                                                             <span class="menu-text"> Ordenes </span>
                                                     </a>
 
                                                     <b class="arrow"></b>
+                                            </li>
+                                        <?php }?>
+
+                                        <?php if(Yii::app()->user->checkAccess('cocina',array(Yii::app()->user->id))) {?>
+                                            <li class="<?php echo ($uri[1]=='cocina') ? 'active' : ''?>">
+                                                <a href="<?php echo Yii::app()->createUrl('cocina');?>">
+                                                    <i class="menu-icon glyphicon glyphicon-fire"></i>
+                                                    <span class="menu-text"> Cocina </span>
+                                                </a>
+
+                                                <b class="arrow"></b>
                                             </li>
                                         <?php }?>
                                                                                                                         
@@ -344,7 +355,7 @@
 		<!-- basic scripts -->
 
 		<!--[if !IE]> -->
-		<script src="<?php echo Yii::app()->theme->baseUrl;?>/assets/js/jquery.2.1.1.min.js"></script>
+		<!--<script src="<?php echo Yii::app()->theme->baseUrl;?>/assets/js/jquery.2.1.1.min.js"></script>-->
 
 		<!-- <![endif]-->
 

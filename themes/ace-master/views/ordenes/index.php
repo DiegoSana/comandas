@@ -1,7 +1,3 @@
-<?php
-Yii::app()->clientScript->registerScriptFile(Yii::app()->getBaseUrl().'/plugins/stopwatch-timer/src/timer.jquery.js',CClientScript::POS_END);
-?>
-
 <?php $this->breadcrumbs=array(
 	'Estado de pedidos',
 );?>
@@ -21,55 +17,58 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->getBaseUrl().'/plugins/
             <?php $this->widget('zii.widgets.grid.CGridView', array(
                     'id'=>'ordenes-grid',
                     'dataProvider'=>$pedidos->search(),
+                    'filter'=>$pedidos,
                     'itemsCssClass'=>'table table-striped table-bordered table-hover',
                     //'filter'=>$pedidos,
-                    'columns'=>array(                            
+                    'columns'=>array(
                             array(
-                                'name'=>'N° de orden',
-                                'value'=>'$data->id'
-                            ),
-                            array(
-                                'name'=>'Imagen',
+                                'name'=>'productos.imagenes.nombre',
                                 'value'=>'"<img style=\"max-width: 6em;max-height: 6em;\" src=\""."/images/productos/".$data->productos->productosImagenes[0]->nombre."\" />"',
                                 'type'=>'raw'
-                            ),                            
+                            ),
                             array(
-                                'name'=>'N° de orden',
+                                'name'=>'id',
                                 'value'=>'$data->id'
                             ),
                             array(
-                                'name'=>'pedidos.id',
+                                'name'=>'nro_pedido_search',
                                 'value'=>'"<a class=\"det\" href=\"".Yii::app()->createUrl(\'pedidos/view\',array(\'id\'=>$data->pedidos->id))."\"><i class=\"glyphicon glyphicon-info-sign\"></i>&nbsp;&nbsp;&nbsp;".$data->pedidos->id."</a>"',
                                 'type'=>'raw'
                             ),
                             array(
-                                'name'=>'pedidos.mesas.nro_mesa',
-                                'value'=>'$data->pedidos->mesas->nro_mesa ? $data->pedidos->mesas->nro_mesa : "Sin mesa"'
+                                'name'=>'nro_mesa_search',
+                                'value'=>'$data->mesa->nro_mesa ? $data->mesa->nro_mesa : "Sin mesa"'
                             ),
                             array(
-                                'name'=>'Solicitado por',
-                                'value'=>'$data->pedidos->usuario->nombre'
+                                'name'=>'usuario_nombre_search',
+                                'value'=>'$data->usuario->nombre'
                             ),
-                            'productos.nombre',
                             array(
-                                'name'=>'opciones',
+                                'name'=>'productos_nombre_search',
+                                'value'=>'$data->productos->nombre'
+                            ),
+                            array(
+                                'name'=>'productos.productos_opciones.nombre',
+                                'header' => 'Adicionales',
                                 'value'=>'formatOpciones($data->productos->productosOpciones, $data->pedidosHasProductoses)',
                             ),
                             'observaciones',
                             array(
                                 'name'=>'hora_pedido',
+                                'filter'=>false,
                                 'value'=>'date("d/m H:i:s", strtotime($data->hora_pedido))',
                             ),
                             array(
-                                'name'=>'tiempo transcurrido',
-                                'value'=>'formatHoraPedido($data->hora_pedido)',
+                                'name'=>'hora_pedido',
+                                'header' => 'Tiempo tarnscurrido',
+                                'filter'=>false,
+                                'value'=>'getTimer($data)',
                                 'type'=>'raw'
                             ),
-                            /*array(
-                                'name'=>'precio',
-                                'value'=>'precioTotal($data->productos, $data->pedidosHasProductoses)',
-                            ),*/
-                            'pedidosHasProductosEstados.estado',
+                            array(
+                                'name' => 'estado_search',
+                                'value' => '$data->pedidosHasProductosEstados->estado',
+                            ),
                             array(
                                     'class'=>'CButtonColumn',
                                     'template'=>'{update}{delete}',
@@ -95,7 +94,7 @@ Yii::app()->clientScript->registerScriptFile(Yii::app()->getBaseUrl().'/plugins/
                                                 'label'=>'',
                                                 'imageUrl'=>'',  //Image URL of the button.
                                                 'options'=>array('class'=>'ok tooltip-success toolt btn btn-xs btn-success ace-icon glyphicon glyphicon-check', 'style'=>'display:inline;', 'data-rel'=>'tooltip','title'=>'Entregado'), //HTML options for the button tag.
-                                                'visible'=>'$data->pedidos_has_productos_estados_id==PedidosHasProductosEstados::COCINA || $data->pedidos_has_productos_estados_id==PedidosHasProductosEstados::CANCELADO'
+                                                'visible'=>'$data->pedidos_has_productos_estados_id==PedidosHasProductosEstados::COCINA || $data->pedidos_has_productos_estados_id==PedidosHasProductosEstados::CANCELADO || $data->pedidos_has_productos_estados_id==PedidosHasProductosEstados::CONFIRMADO'
                                         ),
                                         'cancelado'=>array(
                                                 'url'=>'Yii::app()->createUrl("ordenes/cancelar",array("id"=>$data->id))',
@@ -244,50 +243,59 @@ function precioTotal($producto, $selecciones)
     return $producto->precio+$precioAdic;
 }
 
-function formatHoraPedido($time)
-{
-    //echo date('Y-m-d H:i:s');
-    $timeFirst  = strtotime($time);
-    //$timeFirst  = strtotime('2015-09-20 18:20:15');
+function getTimer($data) {
+
+    $timeFirst  = strtotime($data->hora_pedido);
     $timeSecond = strtotime(date('Y-m-d H:i:s'));
     $differenceInSeconds = $timeSecond - $timeFirst;
-    
-    if($differenceInSeconds<3600)
-    {
-    echo 
-    '
-	<script type="text/javascript">            
-            $(document).ready(function() {
-                
-                $("#'.$timeFirst.'").timer({
-                    seconds: '.$differenceInSeconds.',
-                    duration: "5s",
-                    callback: function(a) {
-                        if($("#'.$timeFirst.'").data("seconds")>1200)
-                            $("#'.$timeFirst.'").addClass("text-warning");
-                        if($("#'.$timeFirst.'").data("seconds")>1800)
-                            $("#'.$timeFirst.'").addClass("text-danger");
+    if($data->pedidos_has_productos_estados_id == PedidosHasProductosEstados::ENTREGADO && $data->hora_pedido_entregado) {
+        $timeEnd = strtotime($data->hora_pedido_entregado);
+        echo gmdate("H:i:s", $timeEnd - $timeFirst);
+    } elseif($differenceInSeconds > 60*60) {
+        echo '+1 hs.';
+    }else{
+        echo '<label id="minutes' . $data->id . '">00</label>:<label id="seconds' . $data->id . '">00</label>';
+        Yii::app()->clientScript->registerScript(
+            $data->id,
+            'jQuery(function($) {
+                var interval'.$data->id.' = setInterval(
+                    function () {
+                        seconds = Math.ceil(new Date().getTime() / 1000);
+                        differenceInSeconds = seconds - '.$timeFirst.';
+                        document.getElementById("seconds' . $data->id . '").innerHTML = pad((differenceInSeconds)%60);
+                        document.getElementById("minutes' . $data->id . '").innerHTML = pad(parseInt((differenceInSeconds)/60));
+                        if(document.getElementById("minutes' . $data->id . '").innerHTML > 59) {
+                            document.getElementById("minutes' . $data->id . '").parentElement.innerHTML = "+1 hs.";
+                            clearInterval(interval'.$data->id.');
+                        }else if(document.getElementById("minutes' . $data->id . '").innerHTML > 14) {
+                            document.getElementById("minutes' . $data->id . '").className = "red bolder";
+                            document.getElementById("seconds' . $data->id . '").className = "red bolder";
+                        } else{
+                            document.getElementById("minutes' . $data->id . '").className = "green bolder";
+                            document.getElementById("seconds' . $data->id . '").className = "green bolder";                        
+                        }
                     },
-                    repeat: true
-                });
-                $("#'.$timeFirst.'").timer();
-            });
-	</script>
-    ';
+                    1000
+                );
+            })',
+            CClientScript::POS_END);
     }
-    else
-    {
-    echo 
-    '
-	<script type="text/javascript">            
-            $(document).ready(function() {
-                $("#'.$timeFirst.'").html("tiempo excedido");
-            });
-	</script>
-    ';    
-    }
-    return '<b id="'.$timeFirst.'"></b>';
 }
+
+Yii::app()->clientScript->registerScript('timerScript','
+    function pad(val)
+    {    
+        var valString = val + "";
+        if(valString.length < 2)
+        {
+            return "0" + valString;
+        }
+        else
+        {
+            return valString;
+        }
+    }
+',CClientScript::POS_BEGIN);
 ?>
 <script type="text/javascript">
 jQuery(function($) {
