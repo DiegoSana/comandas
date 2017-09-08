@@ -28,7 +28,7 @@ class Controller extends CController
         public function init() {            
             
             if(isset($_GET['pid']))
-            {                
+            {
                 if(Yii::app()->user->id)
                     Yii::app()->session->destroy();
                 $model=new LoginForm;
@@ -37,7 +37,7 @@ class Controller extends CController
                 $model->login();
             }
             if(Yii::app()->user->id)
-            {                    
+            {
                 if(isset(Yii::app()->user->es_comensal) && Yii::app()->user->es_comensal)
                 {
                     if(Pedidos::model()->findByAttributes(array('hash'=>Yii::app()->user->id), 'pedidos_estados_id != '.Pedidos::ACTIVO))

@@ -11,7 +11,11 @@ class MenuController extends Controller
                 parent::init();
                 
                 $arr = explode('.', $_SERVER["HTTP_HOST"]);
-                if(isset(Yii::app()->user->usuario)) {
+
+                if($_SERVER["HTTP_HOST"] == 'local.paraiso.com') {
+                    $app = Aplicacion::model()->findByAttributes(array('subdominio'=>'paraiso1'));
+                    Yii::app()->user->setState('aplicacion',$app);
+                } elseif(isset(Yii::app()->user->usuario)) {
                     if($arr[0] != DEFAULT_SUBDOMINIO) {
                         // Acá esta logueado y sabemos a que menu va por el subdominio
                         if(isset(Yii::app()->user->usuario) && isset(Yii::app()->user->aplicaciones) && count(Yii::app()->user->aplicaciones)==1) {
@@ -55,7 +59,7 @@ class MenuController extends Controller
                     $this->categorias = Categorias::model()->findAllByAttributes(array(),'id IN ('.  implode(',', $categoriasIds).')');                
 	}
 
-        public function filters()
+    public function filters()
 	{
 		return array(
 			'accessControl', // perform access control for CRUD operations
@@ -87,9 +91,9 @@ class MenuController extends Controller
 	}
         
 	public function actionIndex()
-	{            
-            Yii::app()->setTheme('nativeDroid2');
-            $this->layout= '//layouts/main';
+	{
+        Yii::app()->setTheme('nativeDroid2');
+        $this->layout= '//layouts/main';
 		$this->render('index',array('categorias'=>$this->categorias));
 	}
         

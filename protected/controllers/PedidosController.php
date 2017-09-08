@@ -89,7 +89,7 @@ class PedidosController extends Controller
                         $pedido=new Pedidos;
                         $pedido->mesas_id = $mesa->id;
                         $pedido->pedidos_estados_id = 1;
-                        $pedido->hash = md5($i.mktime());
+                        $pedido->hash = md5($i.time());
                         $pedido->aplicacion_id = intval($_POST['Pedidos']['mesas_id']);
                         $pedido->qr_image = $this->createQR($pedido->hash, $mesa->aplicacion->subdominio);
 			$pedido->save();                        
@@ -157,7 +157,7 @@ class PedidosController extends Controller
                     if($i==18)
                         break;
                 }
-                $filemane = mktime();
+                $filemane = time();
                 $pdf->Output('tmp/'.$filemane.'.pdf');
                 echo $filemane;
             }
