@@ -13,7 +13,8 @@ docker network create --subnet=172.18.0.0/16 mynet
 
 3. correr docker apache-ubuntu:
 ```
-docker run -v /var/www/Comandas/comandas:/var/www/html --net mynet --ip 172.18.0.3 -it diegohsanabria/ubuntu:comandas
+docker run -v /var/www/Comandas/comandas:/var/www/html --net mynet --ip 172.18.0.3 -p 8080:80 -it diegohsanabria/ubuntu:comandas
+service apache2 start
 ```
 
 4. correr docker mysql:
