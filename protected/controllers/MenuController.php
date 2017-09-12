@@ -12,36 +12,27 @@ class MenuController extends Controller
                 
                 $arr = explode('.', $_SERVER["HTTP_HOST"]);
 
-                if($_SERVER["HTTP_HOST"] == 'local.paraiso.com') {
-                    $app = Aplicacion::model()->findByAttributes(array('subdominio'=>'paraiso1'));
-                    Yii::app()->user->setState('aplicacion',$app);
-                } elseif(isset(Yii::app()->user->usuario)) {
+                if(isset(Yii::app()->user->usuario)) {
                     if($arr[0] != DEFAULT_SUBDOMINIO) {
-                        // Acá esta logueado y sabemos a que menu va por el subdominio
+                        // Acá esta logueado y accediendo al menu por la url del establecimiento. Seteo la aplicacion
                         if(isset(Yii::app()->user->usuario) && isset(Yii::app()->user->aplicaciones) && count(Yii::app()->user->aplicaciones)==1) {
                             Yii::app()->user->setState('aplicacion',Yii::app()->user->aplicaciones[0]);
                         } else {
-                            $app = Aplicacion::model()->findByAttributes(array('subdominio'=>$arr[0]));
+                            $app = Aplicacion::model()->findByPk(APP_ID);
                             Yii::app()->user->setState('aplicacion',$app);
                         }
                     } else {
-                        // Acá esta logueado pero NO sabemos a que menu va por el subdominio
-                        if(isset(Yii::app()->user->usuario) && isset(Yii::app()->user->aplicaciones) && count(Yii::app()->user->aplicaciones)>1) {
-                            foreach (Yii::app()->user->aplicaciones as $app)
-                                echo '<a href="//'.$app->subdominio.'.'.$arr[1].'.'.$arr[2].'/menu">'.$app->nombre.'</a> ';
-                            die;
-                        } else {                            
-                            $this->redirect('http://'.Yii::app()->user->aplicaciones[0]->subdominio.'.comandas.com.ar/menu');
-                        }
+                        // Acá esta logueado y tratando de acceder al menu por la url de comandas
+                        $this->redirect('site/index');
                     }
                     
                 } else {
-                    if($arr[0] != DEFAULT_SUBDOMINIO) {
-                        // Acá NO esta logueado y sabemos a que menu va por el subdominio
-                        if($app = Aplicacion::model()->findByAttributes(array('subdominio'=>$arr[0])))
+                    if($arr[1] != DEFAULT_DOMINIO) {
+                        // Acá NO esta logueado. Seteamos la app segun url
+                        if($app = Aplicacion::model()->findByPk(APP_ID))
                             Yii::app()->user->setState('aplicacion',$app);
                     } else {
-                        // Acá NO esta logueado y tampoco sabemos a que menu va por el subdominio
+                        // Acá NO esta logueado y trata de acceder al menu por la url de comandas
                         $this->redirect(DEFAULT_URL.'/site/home');
                     }
                     
