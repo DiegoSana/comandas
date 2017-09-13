@@ -132,7 +132,7 @@ $('#pedidos-grid a.det').click(function() {
 $('#pedidos-grid a.pay').click(function() {        
     var url = $(this).attr('href');
     bootbox.confirm({
-            message: 'Si marca el pedido como pagado, todas las ordenes dentro del pedido seran marcadas como entregadas.<br>¿Está de acuerdo?',
+            message: 'Si marca el pedido como pagado, todas las ordenes dentro del pedido pasarán a la grilla de ordenes para comenzar su preparación.<br>¿Está de acuerdo?',
             buttons: {
               confirm: {
                      label: 'Estoy de acuerdo',

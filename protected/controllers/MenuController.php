@@ -13,7 +13,7 @@ class MenuController extends Controller
                 $arr = explode('.', $_SERVER["HTTP_HOST"]);
 
                 if(isset(Yii::app()->user->usuario)) {
-                    if($arr[0] != DEFAULT_SUBDOMINIO) {
+                    if($arr[1] != DEFAULT_DOMINIO) {
                         // Acá esta logueado y accediendo al menu por la url del establecimiento. Seteo la aplicacion
                         if(isset(Yii::app()->user->usuario) && isset(Yii::app()->user->aplicaciones) && count(Yii::app()->user->aplicaciones)==1) {
                             Yii::app()->user->setState('aplicacion',Yii::app()->user->aplicaciones[0]);
