@@ -13,13 +13,3 @@
 <p>
     Disfruta de tu comida, comparte tu experiencia en las redes sociales, agrega comentarios sobre los platos
 </p>
-
-<?php
-if(!isset(Yii::app()->user->usuario)) {
-    Yii::app()->clientScript->registerScript('popUpInicio', "
-        jQuery(function($) {
-            $( '#popupDialog' ).popup( 'open' );
-        });
-    ",  CClientScript::POS_LOAD);
-}
-?>

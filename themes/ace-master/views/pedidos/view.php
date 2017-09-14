@@ -40,33 +40,47 @@ $this->breadcrumbs=array(
             <div class="profile-info-name"> Ordenes </div>
 
             <div class="profile-info-value">
-                <table id="simple-table" class="table  table-bordered table-hover">
-                    <tbody>
-                        <?php
-                        if($model->pedidosHasProductos){
-                            foreach ($model->pedidosHasProductos as $p) {
-                                    if($p->pedidos_has_productos_id) {
-                        ?>
-                                        <tr>                                        
-                                            <td><?php echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;'.$p->productos->nombre;?></td>
-                                            <td></td>
-                                            <td><?php echo $p->productos->precio;?></td>
-                                        </tr>
-                        <?php
-                                    } else {
-                        ?>
-                                        <tr>
-                                            <td><?php echo $p->productos->nombre; echo $p->observaciones ? ' ('.$p->observaciones.')' : '';?></td>
-                                            <td><?php echo $p->pedidosHasProductosEstados->estado;?></td>
-                                            <td><?php echo '$ '.$p->productos->precio;?></td>
-                                        </tr>
-                        <?php
-                                    }
-                            }
-                        }
-                        ?>
-                    </tbody>
-                </table>
+                    <?php
+                    $this->widget('zii.widgets.grid.CGridView', array(
+                        'id'=>'pedidos-grid',
+                        'ajaxUpdate' => true,
+                        'summaryText' => FALSE,
+                        'itemsCssClass'=>'table table-striped table-bordered table-hover',
+                        'rowCssClassExpression'=>'$data->pedidos_has_productos_id?"row-closed":"row-open"',
+                        'dataProvider' => $a,
+                        'columns' => array(
+                            [
+                                'name' => 'productos.nombre',
+                                'value' => '$data->observaciones ? $data->productos->nombre." (".$data->observaciones.")" : $data->productos->nombre',
+                            ],
+                            [
+                                'name' => 'adicionales',
+                                'value' => '$data->formatAdicionales()',
+                            ],
+                            [
+                                'name' => 'pedidosHasProductosEstados.estado',
+                            ],
+                            [
+                                'name' => 'productos.precio',
+                                'value' => '$data->getPrecioConAdicionales()',
+                            ],
+                            [
+                                'class'=>'CButtonColumn',
+                                'headerHtmlOptions'=>[],
+                                'htmlOptions'=>['style'=>'text-align:left;'],
+                                'template'=>'{borrar}',
+                                'buttons'=>[
+                                    'borrar'=>array(
+                                        'label'=>'',
+                                        'imageUrl'=>'',  //Image URL of the button.
+                                        'options'=>array('class'=>'tooltip-error toolt btn cerrar btn-xs btn-danger glyphicon glyphicon-remove', 'style'=>'display:inline;', 'data-rel'=>'tooltip','title'=>'Eliminar'),
+                                        'url'=>'Yii::app()->controller->createUrl("close",array("id"=>$data->id))',
+                                    ),
+                                ]
+                            ]
+                        ),
+                    ));
+                    ?>
             </div>
     </div>
 
@@ -82,7 +96,10 @@ $this->breadcrumbs=array(
 <!--<button class="btn btn-success" id="gritter-without-image">Without Image</button>-->
 
 
-
+<style>
+    .row-closed {
+        display: none;}
+</style>
 
 <script type="text/javascript">
 jQuery(function($) {

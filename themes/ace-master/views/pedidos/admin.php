@@ -29,7 +29,7 @@ $this->breadcrumbs=array(
                     'ajaxUpdate' => true,
                     'dataProvider'=>$model->search(),
                     'itemsCssClass'=>'table table-striped table-bordered table-hover',
-                    'htmlOptions'=>array(),
+                    'htmlOptions'=>[],
                     'pagerCssClass'=>'dataTables_paginate paging_simple_numbers',
                     'columns'=>array(
                             array(
@@ -110,11 +110,13 @@ $this->breadcrumbs=array(
 
 <?php
 Yii::app()->clientScript->registerScript('actions', "
-$('#pedidos-grid a.det').click(function() {        
+$('#pedidos-grid a.det').click(function() {
+        console.log($(this).parent());
         var url = $(this).attr('href');
         //  do your post request here
         $.post(url,function(res){
             bootbox.dialog({
+                    size: 'large',
                     title: 'Detalles del pedido',
                     message: res,
                     buttons: 			
@@ -122,8 +124,14 @@ $('#pedidos-grid a.det').click(function() {
                             'click' :
                             {
                                     'label' : 'Cerrar',
-                                    'className' : 'btn-sm btn-primary'
-                            }
+                                    'className' : 'btn-sm btn-primary'                                    
+                            }/*,
+                            'pagado' :
+                            {
+                                    'label' : 'Pagado',
+                                    'className' : 'btn-sm btn-success',
+                                    'callback': function() { $('#pedidos-grid a.pay').click(); }
+                            }*/
                     }
             });
          });
