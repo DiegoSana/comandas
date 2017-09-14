@@ -53,16 +53,22 @@ class PedidosController extends Controller
 	 */
 	public function actionView($id)
 	{
-                $model = Pedidos::model()->with(
-                        array('productoses',
-                            'usuario',
-                            'mesas'=>array(
-                                'condition'=>"mesas.aplicacion_id = ".Yii::app()->user->aplicacion->id
-                            ))
-                        )->findByPk($id);
-		$this->renderPartial('view',array(
-			'model'=>$model,
-		));
+        $model = Pedidos::model()->with(
+                array('productoses',
+                    'usuario',
+                    'mesas'=>array(
+                        'condition'=>"mesas.aplicacion_id = ".Yii::app()->user->aplicacion->id
+                    ))
+                )->findByPk($id);
+        $criteria = new CDbCriteria();
+        $criteria->addCondition('pedidos_id = '.$model->id);
+        $criteria->with = ['productos'];
+        $a = new CActiveDataProvider('PedidosHasProductos',['criteria'=>$criteria]);
+        $a->pagination = false;
+        $this->renderPartial('view',array(
+            'model'=>$model,
+            'a' => $a
+        ));
 	}
 
 	/**

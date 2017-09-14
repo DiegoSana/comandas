@@ -105,11 +105,11 @@
 
                                         <div data-role="content">
                                             <form id="registro-form">
-                                                <label for="name2b">Ingresá tu nombre para comenzar a pedir</label>
-                                                <input type="text" name="nombre" id="nombre" value="" data-clear-btn="true" placeholder="Nombre">
+                                                <!--<label for="name2b">Ingresá tu nombre para comenzar a pedir</label>-->
+                                                <input type="text" name="nombre" id="nombre" value="" data-clear-btn="true" placeholder="TU NOMBRE">
                                                 <span class="clr-red" id="error-msg"></span>
-                                                <button data-rel="back" id="registrar" data-role="button" data-inline="true" class="ui-btn ui-btn-primary"><i class='zmdi zmdi-check'></i> Comenzar</button>
-                                                <button data-rel="back" data-role="button" data-inline="true" class="ui-btn ui-btn-primary"><i class='zmdi zmdi-cancel'></i> Cancelar</button>
+                                                <button data-rel="back" id="registrar" data-role="button" data-inline="true" class="ui-btn ui-btn-success">Comenzar</button>
+                                                <!--<button data-rel="back" data-role="button" data-inline="true" data-mini="true" class="ui-btn ui-btn-primary">Cancelar</button>-->
                                             </form>
                                         </div>
                                 </div>
@@ -135,6 +135,13 @@
                                     return false;
                                 });
                                 ",  CClientScript::POS_LOAD);
+                                if(!isset(Yii::app()->user->usuario)) {
+                                    Yii::app()->clientScript->registerScript('popUpInicio', "
+                                        jQuery(function($) {
+                                            $( '#popupDialog' ).popup( 'open' );
+                                        });
+                                    ",  CClientScript::POS_LOAD);
+                                }
                                 Yii::app()->clientScript->registerScript('pageLoaded', "
                                     $(document).on('pagebeforecreate', '[data-role=\"page\"]', function(){     
                                         var interval = setInterval(function(){
@@ -169,6 +176,6 @@
 		<script src="<?php echo Yii::app()->theme->baseUrl;?>/vendor/wow/wow.min.js"></script>
 		<script src="<?php echo Yii::app()->theme->baseUrl;?>/js/nativedroid2.js"></script>
 		<script src="<?php echo Yii::app()->theme->baseUrl;?>/nd2settings.js"></script>
-                <script src="/plugins/Swiper-master/dist/js/swiper.min.js"></script>
+        <?php Yii::app()->clientScript->registerScriptFile('/themes/nativeDroid2/js/menu-producto.js'); ?>
 	</body>
 </html>

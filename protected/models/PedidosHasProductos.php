@@ -94,6 +94,28 @@ class   PedidosHasProductos extends CActiveRecord
 		);
 	}
 
+	public function isAdicional() {
+	    if($this->pedidos_has_productos_id) return false;
+	    if(PedidosHasProductos::model()->findByAttributes(['pedidos_has_productos_id' => $this->id])) return true;
+	    return false;
+    }
+
+    protected function formatAdicionales() {
+	    $arr = [];
+        foreach ($this->pedidosHasProductoses as $pedidosHasProducto) {
+            $arr[] = $pedidosHasProducto->productos->nombre;
+	    }
+	    return implode(', ',$arr);
+    }
+
+    protected function getPrecioConAdicionales() {
+        $price = $this->productos->precio;
+        foreach ($this->pedidosHasProductoses as $pedidosHasProducto) {
+            $price += $pedidosHasProducto->productos->precio;
+        }
+        return $price;
+    }
+
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.
 	 *

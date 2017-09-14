@@ -1,44 +1,3 @@
-<?php Yii::app()->clientScript->registerScript('agregarPedido', "
-$(window).on('hashchange',function() {
-$('#pedirBtn').click(function() {
-    $.ajax({
-        method: 'POST',
-        url: '".Yii::app()->createUrl('menu/agregarProducto')."',
-        data: $('#pedido-form').serialize()
-    })
-    .done(function( rta ) {
-        var obj = jQuery.parseJSON( rta );
-        if( obj.status == true )
-        {
-            $('.popResponse').html('');
-            window.location.href = '".Yii::app()->createUrl('menu')."';
-        }
-        else
-        {
-            console.log($('#pedido-form').serialize());
-            $('.popResponse').html(obj.msg).addClass('clr-red');
-        }
-    });
-    return false;
-});
-});
-",  CClientScript::POS_LOAD);
-?>
-<?php Yii::app()->clientScript->registerScript('swiper', "
-    var mySwiper = new Swiper ('.swiper-container', {
-    // Optional parameters
-    direction: 'horizontal',
-    
-    // If we need pagination
-    pagination: '.swiper-pagination',
-    
-    // Navigation arrows
-    nextButton: '.swiper-button-next',
-    prevButton: '.swiper-button-prev',
-  })
-",  CClientScript::POS_LOAD);
-?>
-
 <div data-role="navbar" data-grid="d">
     <ul>        
         <li style="min-width: 20%; width: auto;"><a href="<?php echo Yii::app()->createUrl('menu/categoria',array('categoria'=>$categoriaFrom->id));?>"><?php echo $categoriaFrom->nombre.' >';?></a></li>
@@ -141,8 +100,8 @@ $('#pedirBtn').click(function() {
             </div>
         <?php }?>
         <?php $this->endWidget(); ?>
-        <button id="pedirBtn" data-role="button" data-inline="true" class="ui-btn ui-btn-primary"><i class='zmdi zmdi-check'></i>Aceptar</button>
-        <a href="#" data-rel="back" data-role="button" data-inline="true" class="ui-btn ui-btn-primary"><i class='zmdi zmdi-cancel'></i>Cancelar</a>
+        <button id="pedirBtn" data-role="button" data-inline="true" onclick="menu.producto.realizarPedido();" class="ui-btn ui-btn-primary">Aceptar</button>
+        <a href="#" data-rel="back" data-role="button" data-inline="true" class="ui-btn ui-btn-primary">Cancelar</a>
     </div>
 </div>
     <!-- Demo styles -->
