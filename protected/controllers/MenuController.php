@@ -186,7 +186,7 @@ class MenuController extends Controller
                         $appId = Yii::app()->user->aplicacion->id;
                     $productos = Productos::model()->with(array('categorias','productosImagenes'))->findAll(
                             array(
-                                'condition'=>'categorias.id = '.$categoria->id.' AND t.aplicacion_id = '.$appId
+                                'condition'=>'categorias.id = '.$categoria->id.' AND t.aplicacion_id = '.$appId.' AND mostrable = 1'
                                 )
                             );
                     $this->render('categoria',array('productos'=>$productos, 'categoria'=>$categoria));
