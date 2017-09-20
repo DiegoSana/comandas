@@ -18,7 +18,7 @@ docker run -v /var/www/Comandas:/var/www/html --net mynet --ip 172.18.0.3 -it di
 
 4. correr docker mysql:
 ```
-docker run --net mynet --ip 172.18.0.2 -it diegohsanabria/mysql:comandas
+docker run --net mynet --ip 172.18.0.2 --name mysql_comandas -v /home/ubuntu/docker-volumes/mysql-comandas:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root -d mysql:5.6
 ```
 
 5. crear la base de datos dentro del contenedor de mysql:
